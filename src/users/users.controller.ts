@@ -33,12 +33,7 @@ export class UsersController {
 
   @Get(':username')
   getProfileByUsername(@Param('username') username: string) {
-    const user = this.usersService.findOneByUsername(username);
-
-    if (!user) {
-      throw new Error('Пользователь не найден');
-    }
-    return user;
+    return this.usersService.findOneByUsername(username);
   }
 
   @Get('me/wishes')

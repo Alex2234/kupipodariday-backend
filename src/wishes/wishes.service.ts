@@ -98,6 +98,20 @@ export class WishesService {
       throw new NotFoundException(`Wish с ${id} не найден`);
     }
 
+    const existingCopy = await this.wishRepository.findOne({
+      where: {
+        owner: { id: user.id },
+        description: wish.description,
+        price: wish.price,
+        link: wish.link,
+        image: wish.image,
+      },
+    });
+
+    if (existingCopy) {
+      throw new NotFoundException('Вы уже копировали себе этот подарок');
+    }
+
     const copiedWish = this.wishRepository.create({
       ...wish,
       createdAt: undefined,

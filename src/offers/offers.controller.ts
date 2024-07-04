@@ -28,10 +28,6 @@ export class OffersController {
 
   @Get(':id')
   getOfferById(@Param('id') id: string) {
-    const offer = this.offersService.findOne(Number(id));
-    if (!offer) {
-      throw new Error('Offer не найден');
-    }
-    return offer;
+    return this.offersService.findOne(Number(id));
   }
 }

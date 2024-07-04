@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { Repository } from 'typeorm';
@@ -20,14 +20,14 @@ export class OffersService {
   async create(createOfferDto: CreateOfferDto, userId: number): Promise<Offer> {
     const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
-      throw new Error('User не найден');
+      throw new NotFoundException('User не найден');
     }
 
     const item = await this.wishesRepository.findOne({
       where: { id: createOfferDto.itemId },
     });
     if (!item) {
-      throw new Error('Wish не найден');
+      throw new NotFoundException('Wish не найден');
     }
 
     const offer = this.offersRepository.create({
@@ -39,11 +39,11 @@ export class OffersService {
     const savedOffer = await this.offersRepository.save(offer);
 
     if (item.raised >= item.price) {
-      throw new Error('Сумма собрана');
+      throw new NotFoundException('Сумма собрана');
     }
 
     if (createOfferDto.amount > item.price) {
-      throw new Error('Сумма больше нужной');
+      throw new NotFoundException('Сумма больше нужной');
     }
     item.raised += createOfferDto.amount;
     await this.wishesRepository.save(item);
@@ -58,9 +58,15 @@ export class OffersService {
   }
 
   async findOne(id: number) {
-    return await this.offersRepository.findOne({
+    const offer = await this.offersRepository.findOne({
       where: { id },
       relations: ['user', 'item'],
     });
+
+    if (!offer) {
+      throw new NotFoundException(`Offer с ${id} не найден`);
+    }
+
+    return offer;
   }
 }

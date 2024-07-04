@@ -21,7 +21,7 @@ export class WishlistsService {
 
     const items = await this.wishRepository.findBy({ id: In(itemsId) });
     if (items.length !== itemsId.length) {
-      throw new Error('Некоторые из указанных wish не найдены');
+      throw new NotFoundException('Некоторые из указанных wish не найдены');
     }
 
     const wishlist = this.wishlistRepository.create({
